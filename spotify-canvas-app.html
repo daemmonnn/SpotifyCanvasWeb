@@ -3,8 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Canvas API</title>
+    <title>Spotify Canvas Downloader</title>
+    <meta name="description" content="Download Spotify Canvas videos - the looping visuals behind songs">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --spotify-green: #1DB954;
+            --spotify-green-hover: #1ed760;
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #181818;
+            --bg-tertiary: #282828;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #767676;
+            --border-color: #404040;
+            --error-bg: rgba(229, 57, 53, 0.2);
+            --error-border: #e53935;
+            --error-text: #ff6b6b;
+            --success-bg: rgba(29, 185, 84, 0.2);
+            --success-border: #1DB954;
+            --success-text: #1ed760;
+            --info-bg: rgba(13, 110, 253, 0.2);
+            --info-border: #0d6efd;
+            --info-text: #6ba3ff;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,10 +37,11 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #0f0f0f;
-            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
@@ -27,20 +53,66 @@
         header {
             text-align: center;
             margin-bottom: 40px;
-            padding: 20px 0;
-            border-bottom: 1px solid #282828;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
         }
 
-        h1 {
-            font-size: 32px;
+        header h1 {
+            font-size: 36px;
             font-weight: 700;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--spotify-green) 0%, #1ed760 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .subtitle {
-            color: #b3b3b3;
-            font-size: 14px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-small {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-small.primary {
+            background-color: var(--spotify-green);
+            color: #000;
+        }
+
+        .btn-small.primary:hover {
+            background-color: var(--spotify-green-hover);
+            transform: scale(1.05);
+        }
+
+        .btn-small.secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-small.secondary:hover {
+            background-color: #333;
         }
 
         .main-content {
@@ -51,10 +123,17 @@
         }
 
         .panel {
-            background-color: #181818;
-            border-radius: 8px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
             padding: 24px;
-            border: 1px solid #282828;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
         .panel h2 {
@@ -88,11 +167,11 @@
         input[type="password"],
         textarea {
             width: 100%;
-            padding: 12px;
-            background-color: #282828;
-            border: 1px solid #404040;
-            border-radius: 4px;
-            color: #ffffff;
+            padding: 14px 16px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
             font-size: 14px;
             font-family: inherit;
             transition: all 0.2s ease;
@@ -102,9 +181,9 @@
         input[type="password"]:focus,
         textarea:focus {
             outline: none;
-            border-color: #1DB954;
+            border-color: var(--spotify-green);
             background-color: #333333;
-            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.15);
         }
 
         textarea {
@@ -122,9 +201,9 @@
 
         button {
             flex: 1;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 24px;
+            border-radius: 28px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -134,13 +213,14 @@
         }
 
         .btn-primary {
-            background-color: #1DB954;
+            background-color: var(--spotify-green);
             color: #000000;
         }
 
         .btn-primary:hover {
-            background-color: #1ed760;
+            background-color: var(--spotify-green-hover);
             transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
         }
 
         .btn-primary:active {
@@ -148,9 +228,9 @@
         }
 
         .btn-secondary {
-            background-color: #282828;
-            color: #ffffff;
-            border: 1px solid #404040;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
@@ -211,12 +291,18 @@
         }
 
         .canvas-item {
-            background-color: #282828;
-            border-radius: 8px;
-            padding: 16px;
-            height: 500px;
-            margin-bottom: 16px;
-            border-left: 3px solid #1DB954;
+            background-color: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--spotify-green);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .canvas-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
 
         .canvas-item:last-child {
@@ -225,17 +311,18 @@
 
         .canvas-header {
             display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 16px;
+            margin-bottom: 16px;
             align-items: flex-start;
         }
 
         .artist-img {
-            width: 56px;
-            height: 56px;
-            border-radius: 4px;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .canvas-info {
@@ -244,28 +331,28 @@
         }
 
         .canvas-info h3 {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 4px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
             word-break: break-word;
         }
 
         .canvas-info p {
             font-size: 13px;
-            color: #b3b3b3;
+            color: var(--text-secondary);
             margin-bottom: 4px;
         }
 
         .canvas-url {
-            background-color: #1f1f1f;
-            border: 1px solid #404040;
-            border-radius: 4px;
-            padding: 12px;
-            margin-top: 12px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 16px;
             word-break: break-all;
-            font-size: 11px;
-            color: #1DB954;
+            font-size: 12px;
+            color: var(--spotify-green);
             font-family: 'Monaco', 'Courier New', monospace;
             max-height: 60px;
             overflow-y: auto;
@@ -273,14 +360,15 @@
 
         .canvas-actions {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 10px;
+            margin-top: 16px;
         }
 
         .canvas-actions button {
             flex: 1;
-            padding: 8px 12px;
-            font-size: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            border-radius: 20px;
         }
 
         .tab-buttons {
@@ -409,41 +497,34 @@
                 width: 64px;
                 height: 64px;
             }
+
+            .canvas-actions {
+                flex-direction: column;
+            }
         }
 
-        .copy-btn {
-            padding: 4px 8px !important;
-            height: 50px;
-            font-size: 11px !important;
-            background-color: #1DB954 !important;
-            color: #000000 !important;
-        }
-
-        .copy-btn:hover {
-            font-size: 13px !important;
-            background-color: #1ed760 !important;
-        }
-
-        .play-btn {
-            padding: 4px 8px !important;
-            font-size: 11px !important;
-            height: 50px;
-            background-color: #282828 !important;
-            color: #ffffff !important;
-            border: 1px solid #404040 !important;
-        }
-
-        .play-btn:hover {
-            font-size: 13px !important;
-            background-color: #333333 !important;
+        .copy-btn, .download-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: auto !important;
+            min-height: 44px !important;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Canvas</h1>
-            <p class="subtitle">Spotify Canvas API Client</p>
+            <h1>🎵 Spotify Canvas Downloader</h1>
+            <p class="subtitle">Download looping canvas videos from Spotify tracks</p>
+            <div class="header-actions">
+                <a href="https://github.com/Paxsenix0/Spotify-Canvas-API" target="_blank" rel="noopener noreferrer" class="btn-small secondary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-1.334-.443-.755.037-1.333.037-1.333.497-.423 1.333-.423 1.333-.423.736 0 1.121.755 1.121.755.653 1.119 1.712 1.119 1.712 1.119.909 0 1.333-.909 1.333-.909.443-.755.037-1.333.037-1.333-.497-.423 1.333-.423 1.333-.423.736 0 1.121.755 1.121.755.653 1.119 1.712 1.119 1.712 1.119.909 0 1.333-.909 1.333-.909.443-.755.037-1.333.037-1.333-.497-.423 1.333-.423 1.333-.423z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
         </header>
 
         <div class="main-content">
@@ -622,63 +703,87 @@
             let html = '';
             
             data.data.canvasesList.forEach((canvas, index) => {
-    const artist = canvas.artist || {};
-    const videoUrl = canvas.canvasUrl || ''; 
-    const escapedUrl = videoUrl.replace(/'/g, "\\'");
+                const artist = canvas.artist || {};
+                const videoUrl = canvas.canvasUrl || ''; 
+                const escapedUrl = videoUrl.replace(/'/g, "\\'");
+                const artistName = artist.artistName || 'Unknown Artist';
+                const canvasId = canvas.id || 'unknown';
 
-    html += `
-        <div class="canvas-item">
-            <div class="canvas-header">
-                ${videoUrl ? `
-                    <video src="${videoUrl}" autoplay loop muted controls width="640" height="360">
-                        Your browser does not support the video tag.
-                    </video>
-                ` : ''}
-                
-                ${artist.artistImgUrl ? `<img src="${artist.artistImgUrl}" alt="Artist" class="artist-img">` : ''}
-                
-                <div class="canvas-info">
-                    <h3>${artist.artistName || 'Unknown Artist'}</h3>
-                    <p>Canvas ID: ${canvas.id}</p>
-                    ${canvas.trackUri ? `<p>Track: ${canvas.trackUri}</p>` : ''}
-                </div>
-            </div>
+                html += `
+                    <div class="canvas-item">
+                        <div class="canvas-header">
+                            ${artist.artistImgUrl ? `<img src="${artist.artistImgUrl}" alt="${artistName}" class="artist-img" loading="lazy">` : ''}
+                            
+                            <div class="canvas-info">
+                                <h3>${artistName}</h3>
+                                <p>Canvas ID: ${canvasId}</p>
+                                ${canvas.trackUri ? `<p>Track: ${canvas.trackUri}</p>` : ''}
+                            </div>
+                        </div>
 
-            ${videoUrl ? `
-                <div class="canvas-url">${videoUrl}</div>
-                <div class="canvas-actions">
-                    <button class="copy-btn" onclick="copyToClipboard('${escapedUrl}')">Copy URL</button>
-                    <!-- REPLACED PREVIEW WITH DOWNLOAD -->
-                    <button class="download-btn" onclick="downloadVideo('${escapedUrl}', 'canvas-${canvas.id}.mp4')">Download</button>
-                </div>
-            ` : ''}
-        </div>
-    `;
-});            
+                        ${videoUrl ? `
+                            <video src="${videoUrl}" autoplay loop muted playsinline controls width="640" height="360" preload="metadata">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="canvas-url">${videoUrl}</div>
+                            <div class="canvas-actions">
+                                <button class="btn-primary copy-btn" onclick="copyToClipboard('${escapedUrl}')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                                        <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                    Copy URL
+                                </button>
+                                <button class="btn-secondary download-btn" onclick="downloadVideo('${escapedUrl}', 'canvas-${canvasId}.mp4')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="7,10 12,15 17,10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    Download
+                                </button>
+                            </div>
+                        ` : '<p class="error-box">No canvas video available for this track</p>'}
+                    </div>
+                `;
+            });            
             contentEl.innerHTML = html;
             resultsEl.classList.add('show');
             hideLoading();
         }
 
         function downloadVideo(url, filename) {
-            fetch(url).then(response => {
-                if (!response.ok) throw new Error('Network error');
-                return response.blob();
-            }).then(blob => {
-                               const blobUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = blobUrl;
-                a.download = filename; // Sets the downloaded file name
-            
-                document.body.appendChild(a);
-                a.click();            
-                window.URL.revokeObjectURL(blobUrl);
-                a.remove();
-            }).catch(error => {
-                console.error('Direct download blocked by CORS, falling back to new tab:', error);
-                window.open(url, '_blank');
-            });
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<svg class="spinner" style="width:14px;height:14px;display:inline-block;margin-right:4px;vertical-align:middle;border-width:2px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" fill="none" stroke-width="2"/></svg> Downloading...';
+            btn.disabled = true;
+
+            fetch(url, { mode: 'cors' })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const blobUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = blobUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(blobUrl);
+                    a.remove();
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showStatus('fetchStatus', 'Download started!', 'success');
+                })
+                .catch(error => {
+                    console.error('Direct download blocked by CORS, opening in new tab:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    window.open(url, '_blank');
+                    showStatus('fetchStatus', 'Opened video in new tab (CORS restriction)', 'info');
+                });
         }
 
         function copyToClipboard(text) {
