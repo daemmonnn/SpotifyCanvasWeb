@@ -29,8 +29,8 @@ An enhanced interactive web application that lets you download Spotify Canvas vi
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Paxsenix0/Spotify-Canvas-API.git
-   cd Spotify-Canvas-API
+   git clone https://github.com/daemmonnn/SpotifyCanvasWeb.git
+   cd SpotifyCanvasWeb
    ```
 
 2. **Install dependencies**
@@ -50,6 +50,10 @@ An enhanced interactive web application that lets you download Spotify Canvas vi
 4. **Start the server**
    ```bash
    node server.js
+   ```
+   or
+   ```bash
+   npm start
    ```
 
 5. **Open the web app**
@@ -177,3 +181,4 @@ If you encounter any issues:
 ---
 
 Made with ❤️ for music lovers everywhere
+Credists PaxSenix0
