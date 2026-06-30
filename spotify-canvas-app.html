@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Canvas API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0f0f0f;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 1px solid #282828;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #b3b3b3;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .panel {
+            background-color: #181818;
+            border-radius: 8px;
+            padding: 24px;
+            border: 1px solid #282828;
+        }
+
+        .panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #b3b3b3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: #282828;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #1DB954;
+            background-color: #333333;
+            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: #1DB954;
+            color: #000000;
+        }
+
+        .btn-primary:hover {
+            background-color: #1ed760;
+            transform: scale(1.02);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: #282828;
+            color: #ffffff;
+            border: 1px solid #404040;
+        }
+
+        .btn-secondary:hover {
+            background-color: #333333;
+            border-color: #535353;
+        }
+
+        .btn-secondary:active {
+            background-color: #1f1f1f;
+        }
+
+        .status {
+            font-size: 13px;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background-color: rgba(29, 185, 84, 0.2);
+            color: #1ed760;
+            border: 1px solid #1DB954;
+        }
+
+        .status.error {
+            background-color: rgba(229, 57, 53, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #e53935;
+        }
+
+        .status.info {
+            background-color: rgba(13, 110, 253, 0.2);
+            color: #6ba3ff;
+            border: 1px solid #0d6efd;
+        }
+
+        .results {
+            background-color: #181818;
+            border-radius: 8px;
+            padding: 24px;
+            border: 1px solid #282828;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .canvas-item {
+            background-color: #282828;
+            border-radius: 8px;
+            padding: 16px;
+            height: 500px;
+            margin-bottom: 16px;
+            border-left: 3px solid #1DB954;
+        }
+
+        .canvas-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .canvas-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .artist-img {
+            width: 56px;
+            height: 56px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .canvas-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .canvas-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .canvas-info p {
+            font-size: 13px;
+            color: #b3b3b3;
+            margin-bottom: 4px;
+        }
+
+        .canvas-url {
+            background-color: #1f1f1f;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 12px;
+            word-break: break-all;
+            font-size: 11px;
+            color: #1DB954;
+            font-family: 'Monaco', 'Courier New', monospace;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+
+        .canvas-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .canvas-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #282828;
+        }
+
+        .tab-button {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            color: #1DB954;
+            border-bottom-color: #1DB954;
+        }
+
+        .tab-button:hover:not(.active) {
+            color: #ffffff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 32px;
+            color: #b3b3b3;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #282828;
+            border-top-color: #1DB954;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-box {
+            background-color: rgba(229, 57, 53, 0.1);
+            border: 1px solid #e53935;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            color: #ff6b6b;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background-color: #282828;
+            border-left: 3px solid #1DB954;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #b3b3b3;
+            line-height: 1.5;
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: #767676;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            header {
+                margin-bottom: 24px;
+                padding: 16px 0;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .canvas-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .artist-img {
+                width: 64px;
+                height: 64px;
+            }
+        }
+
+        .copy-btn {
+            padding: 4px 8px !important;
+            height: 50px;
+            font-size: 11px !important;
+            background-color: #1DB954 !important;
+            color: #000000 !important;
+        }
+
+        .copy-btn:hover {
+            font-size: 13px !important;
+            background-color: #1ed760 !important;
+        }
+
+        .play-btn {
+            padding: 4px 8px !important;
+            font-size: 11px !important;
+            height: 50px;
+            background-color: #282828 !important;
+            color: #ffffff !important;
+            border: 1px solid #404040 !important;
+        }
+
+        .play-btn:hover {
+            font-size: 13px !important;
+            background-color: #333333 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Canvas</h1>
+            <p class="subtitle">Spotify Canvas API Client</p>
+        </header>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>Authentication</h2>
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="cookie">Cookie</button>
+                    <button class="tab-button" data-tab="env">Environment</button>
+                </div>
+
+                <div class="tab-content active" id="cookie-tab">
+                    <div class="form-group">
+                        <label for="spdc">SP_DC Cookie</label>
+                        <input type="password" id="spdc" placeholder="Paste your sp_dc cookie here">
+                        <p class="field-hint">Your Spotify authentication cookie from logged-in session</p>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="env-tab">
+                    <div class="form-group">
+                        <label for="envContent">.env File Content</label>
+                        <textarea id="envContent" placeholder="SP_DC=your_cookie_here"></textarea>
+                        <p class="field-hint">Paste the contents of your .env file</p>
+                    </div>
+                </div>
+
+                <div class="status" id="authStatus"></div>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="setAuth()">Set Authentication</button>
+                    <button class="btn-secondary" onclick="clearAuth()">Clear</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Search Canvas</h2>
+                <div class="form-group">
+                    <label for="trackId">Track ID</label>
+                    <input type="text" id="trackId" placeholder="3OHfY25tqY28d16oZczHc8">
+                    <p class="field-hint">Spotify track ID from URL or URI</p>
+                </div>
+                <div class="form-group">
+                    <label for="trackUri">or Track URI</label>
+                    <input type="text" id="trackUri" placeholder="spotify:track:3OHfY25tqY28d16oZczHc8">
+                    <p class="field-hint">Full Spotify track URI (optional)</p>
+                </div>
+                <div class="status" id="fetchStatus"></div>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="fetchCanvas()">Search</button>
+                    <button class="btn-secondary" onclick="clearResults()">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Canvas Data</h2>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let currentAuth = null;
+
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('spotifyAuth');
+            if (saved) {
+                currentAuth = JSON.parse(saved);
+                showStatus('authStatus', 'Authentication loaded from storage', 'info');
+            }
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+
+        function setAuth() {
+            const spdc = document.getElementById('spdc').value.trim();
+            const envContent = document.getElementById('envContent').value.trim();
+            
+            let cookie = null;
+            
+            if (spdc) {
+                cookie = spdc;
+            } else if (envContent) {
+                const match = envContent.match(/SP_DC\s*=\s*(.+)/);
+                if (match) {
+                    cookie = match[1].trim();
+                }
+            }
+            
+            if (!cookie) {
+                showStatus('authStatus', 'Please provide SP_DC cookie or .env content', 'error');
+                return;
+            }
+            
+            currentAuth = { spdc: cookie };
+            localStorage.setItem('spotifyAuth', JSON.stringify(currentAuth));
+            
+            document.getElementById('spdc').value = '';
+            document.getElementById('envContent').value = '';
+            
+            showStatus('authStatus', 'Authentication set successfully', 'success');
+        }
+
+        function clearAuth() {
+            currentAuth = null;
+            localStorage.removeItem('spotifyAuth');
+            document.getElementById('spdc').value = '';
+            document.getElementById('envContent').value = '';
+            showStatus('authStatus', 'Authentication cleared', 'info');
+        }
+
+        async function fetchCanvas() {
+            if (!currentAuth) {
+                showStatus('fetchStatus', 'Please set authentication first', 'error');
+                return;
+            }
+            
+            const trackId = document.getElementById('trackId').value.trim();
+            const trackUri = document.getElementById('trackUri').value.trim();
+            
+            if (!trackId && !trackUri) {
+                showStatus('fetchStatus', 'Please enter a track ID or URI', 'error');
+                return;
+            }
+            
+            showLoading();
+            showStatus('fetchStatus', 'Fetching canvas data...', 'info');
+            
+            try {
+                const identifier = trackUri || trackId;
+                
+                const response = await fetch(
+                    `${API_BASE}/canvas?trackId=${encodeURIComponent(identifier)}`,
+                    {
+                        headers: {
+                            'X-SP-DC': currentAuth.spdc
+                        }
+                    }
+                );
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayResults(data);
+                showStatus('fetchStatus', 'Canvas data retrieved successfully', 'success');
+            } catch (error) {
+                showStatus('fetchStatus', `Error: ${error.message}`, 'error');
+                console.error(error);
+                hideLoading();
+            }
+        }
+
+        function displayResults(data) {
+            const resultsEl = document.getElementById('results');
+            const contentEl = document.getElementById('resultsContent');
+            
+            if (!data.data || !data.data.canvasesList || data.data.canvasesList.length === 0) {
+                contentEl.innerHTML = '<div class="error-box">No canvas data found for this track</div>';
+                resultsEl.classList.add('show');
+                hideLoading();
+                return;
+            }
+            
+            let html = '';
+            
+            data.data.canvasesList.forEach((canvas, index) => {
+    const artist = canvas.artist || {};
+    const videoUrl = canvas.canvasUrl || ''; 
+    const escapedUrl = videoUrl.replace(/'/g, "\\'");
+
+    html += `
+        <div class="canvas-item">
+            <div class="canvas-header">
+                ${videoUrl ? `
+                    <video src="${videoUrl}" autoplay loop muted controls width="640" height="360">
+                        Your browser does not support the video tag.
+                    </video>
+                ` : ''}
+                
+                ${artist.artistImgUrl ? `<img src="${artist.artistImgUrl}" alt="Artist" class="artist-img">` : ''}
+                
+                <div class="canvas-info">
+                    <h3>${artist.artistName || 'Unknown Artist'}</h3>
+                    <p>Canvas ID: ${canvas.id}</p>
+                    ${canvas.trackUri ? `<p>Track: ${canvas.trackUri}</p>` : ''}
+                </div>
+            </div>
+
+            ${videoUrl ? `
+                <div class="canvas-url">${videoUrl}</div>
+                <div class="canvas-actions">
+                    <button class="copy-btn" onclick="copyToClipboard('${escapedUrl}')">Copy URL</button>
+                    <!-- REPLACED PREVIEW WITH DOWNLOAD -->
+                    <button class="download-btn" onclick="downloadVideo('${escapedUrl}', 'canvas-${canvas.id}.mp4')">Download</button>
+                </div>
+            ` : ''}
+        </div>
+    `;
+});            
+            contentEl.innerHTML = html;
+            resultsEl.classList.add('show');
+            hideLoading();
+        }
+
+        function downloadVideo(url, filename) {
+            fetch(url).then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.blob();
+            }).then(blob => {
+                               const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = filename; // Sets the downloaded file name
+            
+                document.body.appendChild(a);
+                a.click();            
+                window.URL.revokeObjectURL(blobUrl);
+                a.remove();
+            }).catch(error => {
+                console.error('Direct download blocked by CORS, falling back to new tab:', error);
+                window.open(url, '_blank');
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('fetchStatus', 'URL copied to clipboard', 'success');
+            }).catch(() => {
+                showStatus('fetchStatus', 'Failed to copy URL', 'error');
+            });
+        }
+
+        function playCanvas(url) {
+            window.open(url, '_blank');
+        }
+
+        function clearResults() {
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('trackId').value = '';
+            document.getElementById('trackUri').value = '';
+            clearFetchStatus();
+        }
+
+        function showStatus(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `status show ${type}`;
+        }
+
+        function clearFetchStatus() {
+            document.getElementById('fetchStatus').classList.remove('show');
+        }
+
+        function showLoading() {
+            const el = document.getElementById('resultsContent');
+            el.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading canvas data...</p>
+                </div>
+            `;
+            document.getElementById('results').classList.add('show');
+        }
+
+        function hideLoading() {
+            // Loading will be replaced by actual content or error message
+        }
+
+        // Allow Enter key to search
+        document.getElementById('trackId').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchCanvas();
+        });
+        
+        document.getElementById('trackUri').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchCanvas();
+        });
+    </script>
+</body>
+</html>
